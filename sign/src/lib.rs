@@ -4,6 +4,9 @@ use serde_json::json;
 use thiserror::Error;
 use url::Url;
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Debug, Error)]
 pub enum SigningError {
     #[error("Malformed private key")]
