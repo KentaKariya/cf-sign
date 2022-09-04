@@ -10,6 +10,7 @@ sign = { path = "sign" }
 anyhow = "1.0.63"
 clap = { version = "3.2.20", features = ["derive"] }
 url = "2.2.2"
+chrono = "0.4.22"
 
 [profile.release]
 debug = false

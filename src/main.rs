@@ -3,6 +3,7 @@ use std::io::Read;
 use anyhow::Ok;
 use clap::Parser;
 use url::Url;
+use chrono::{Utc, Duration};
 
 /// Generate a signed CloudFront URL using the private key from stdin.
 #[derive(Debug, Parser)]
@@ -22,10 +23,12 @@ struct Args {
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
+    let expire_at = Utc::now() + Duration::seconds(args.duration as i64);
     let mut key = String::new();
     std::io::stdin().read_to_string(&mut key)?;
 
-    let signed_url = sign::sign(args.url.as_ref(), args.duration, &args.key_id, &key)?;
+
+    let signed_url = sign::sign(args.url.as_ref(), expire_at, &args.key_id, &key)?;
     println!("{}", signed_url);
 
     Ok(())
