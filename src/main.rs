@@ -11,8 +11,8 @@ struct Args {
     #[clap(value_parser = Url::parse)]
     url: Url,
 
-    /// Validity in minutes
-    #[clap(short, long, default_value_t = 60)]
+    /// Validity in seconds
+    #[clap(short, long, default_value_t = 3600)]
     duration: u64,
 
     /// CloudFront key ID
