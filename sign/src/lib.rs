@@ -1,8 +1,11 @@
-use chrono::{Duration, Utc};
+use chrono::{Utc, DateTime};
 use openssl::{pkey::PKey, sign::Signer, hash::MessageDigest, base64::encode_block};
 use serde_json::json;
 use thiserror::Error;
 use url::Url;
+
+#[cfg(test)]
+mod tests;
 
 #[derive(Debug, Error)]
 pub enum SigningError {
@@ -48,8 +51,8 @@ fn create_policy(resource: &str, timestamp: i64) -> String {
     }).to_string()
 }
 
-pub fn sign(resource: &str, duration: u64, key_id: &str, key: &str) -> SigningResult<String> {
-    let timestamp = (Utc::now() + Duration::seconds(duration as i64)).timestamp();
+pub fn sign(resource: &str, expire_at: DateTime<Utc>, key_id: &str, key: &str) -> SigningResult<String> {
+    let timestamp = expire_at.timestamp();
     let policy = create_policy(resource.as_ref(), timestamp);
 
     let signature = derive_signature(&policy, key)?;
