@@ -3,19 +3,22 @@ name = "cf-sign"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-name = "cf_sign"
-path = "src/lib.rs"
-
-[[bin]]
-name = "cf-sign"
-path = "src/main.rs"
+[workspace]
 
 [dependencies]
+sign = { path = "sign" }
 anyhow = "1.0.63"
-chrono = "0.4.22"
-serde_json = { version = "1.0.85", features = ["preserve_order"] }
-openssl = "0.10.41"
+clap = { version = "3.2.20", features = ["derive"] }
 url = "2.2.2"
-thiserror = "1.0.33"
+
+[profile.release]
+debug = false
+debug-assertions = false
+overflow-checks = false
+panic = 'unwind'
+incremental = false
+rpath = false
+opt-level = 3
+lto = "fat"
+codegen-units = 1
 
