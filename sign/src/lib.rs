@@ -48,18 +48,19 @@ fn create_policy(resource: &str, timestamp: i64) -> String {
     }).to_string()
 }
 
-pub fn sign(resource: &mut Url, duration: u64, key_id: &str, key: &str) -> SigningResult<()> {
+pub fn sign(resource: &str, duration: u64, key_id: &str, key: &str) -> SigningResult<String> {
     let timestamp = (Utc::now() + Duration::seconds(duration as i64)).timestamp();
     let policy = create_policy(resource.as_ref(), timestamp);
 
     let signature = derive_signature(&policy, key)?;
 
-    resource.query_pairs_mut()
+    let mut url = Url::parse(resource)?;
+    url.query_pairs_mut()
         .append_pair("Expires", &timestamp.to_string())
         .append_pair("Signature", &signature)
         .append_pair("Key-Pair-Id", key_id)
         .finish();
 
-    Ok(())
+    Ok(url.to_string())
 }
 

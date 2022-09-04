@@ -18,12 +18,12 @@ struct Args {
 }
 
 fn main() -> anyhow::Result<()> {
-    let mut args = Args::parse();
+    let args = Args::parse();
     let mut key = String::new();
     std::io::stdin().read_to_string(&mut key)?;
-    sign::sign(&mut args.url, args.duration, &args.key_id, &key)?;
 
-    println!("{}", args.url.as_ref());
+    let signed_url = sign::sign(args.url.as_ref(), args.duration, &args.key_id, &key)?;
+    println!("{}", signed_url);
 
     Ok(())
 }
