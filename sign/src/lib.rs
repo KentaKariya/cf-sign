@@ -50,8 +50,7 @@ fn create_policy(resource: &str, timestamp: i64) -> String {
 
 pub fn sign(resource: &str, duration: u64, key_id: &str, key: &str) -> SigningResult<String> {
     let timestamp = (Utc::now() + Duration::seconds(duration as i64)).timestamp();
-    let policy = create_policy(resource, timestamp);
-    println!("{}", policy);
+    let policy = create_policy(resource.as_ref(), timestamp);
 
     let signature = derive_signature(&policy, key)?;
 
