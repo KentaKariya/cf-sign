@@ -1,21 +1,7 @@
 use chrono::{Utc, DateTime};
 use openssl::{pkey::PKey, sign::Signer, hash::MessageDigest, base64::encode_block};
 use serde_json::json;
-use thiserror::Error;
 use url::Url;
-
-#[cfg(test)]
-mod tests;
-
-#[derive(Debug, Error)]
-pub enum SigningError {
-    #[error("Malformed private key")]
-    MalformedKey(#[from] openssl::error::ErrorStack),
-    #[error("Malformed URL")]
-    MalformedURL(#[from] url::ParseError),
-}
-
-type SigningResult<T> = Result<T, SigningError>;
 
 fn b64_encode(data: &[u8]) -> String {
     encode_block(data)
@@ -29,7 +15,7 @@ fn b64_encode(data: &[u8]) -> String {
         .collect()
 }
 
-fn derive_signature(payload: &str, key: &str) -> SigningResult<String> {
+fn derive_signature(payload: &str, key: &str) -> anyhow::Result<String> {
     let pk = PKey::private_key_from_pem(key.as_bytes())?;
     let mut signer = Signer::new(MessageDigest::sha1(), &pk)?;
 
@@ -51,7 +37,7 @@ fn create_policy(resource: &str, timestamp: i64) -> String {
     }).to_string()
 }
 
-pub fn sign(resource: &str, expire_at: DateTime<Utc>, key_id: &str, key: &str) -> SigningResult<String> {
+pub fn sign(resource: &str, expire_at: DateTime<Utc>, key_id: &str, key: &str) -> anyhow::Result<String> {
     let mut url = Url::parse(resource)?;
     let timestamp = expire_at.timestamp();
 

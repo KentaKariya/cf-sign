@@ -6,11 +6,12 @@ edition = "2021"
 [workspace]
 
 [dependencies]
-sign = { path = "sign" }
 anyhow = "1.0.63"
 clap = { version = "3.2.20", features = ["derive"] }
 url = "2.2.2"
 chrono = "0.4.22"
+serde_json = { version = "1.0.85", features = ["preserve_order"] }
+openssl = "0.10.41"
 
 [profile.release]
 debug = false

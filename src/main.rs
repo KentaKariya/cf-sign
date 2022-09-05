@@ -5,6 +5,11 @@ use clap::Parser;
 use url::Url;
 use chrono::{Utc, Duration};
 
+mod sign;
+
+#[cfg(test)]
+mod tests;
+
 /// Generate a signed CloudFront URL using the private key from stdin.
 #[derive(Debug, Parser)]
 #[clap(author, version, about)]
