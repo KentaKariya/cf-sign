@@ -1,16 +1,18 @@
 [package]
 name = "cf-sign"
-version = "0.1.1"
+version = "1.0.0"
 edition = "2021"
 
-[workspace]
-
 [dependencies]
-sign = { path = "sign" }
 anyhow = "1.0.63"
-clap = { version = "3.2.20", features = ["derive"] }
-url = "2.2.2"
 chrono = "0.4.22"
+clap = { version = "3.2.20", features = ["derive"] }
+config = { version = "0.13.2", default-features = false, features = ["toml"] }
+directories = "4.0.1"
+openssl = "0.10.41"
+url = "2.2.2"
+serde = { version = "1.0.144", features = ["derive"] }
+serde_json = { version = "1.0.85", features = ["preserve_order"] }
 
 [profile.release]
 debug = false
