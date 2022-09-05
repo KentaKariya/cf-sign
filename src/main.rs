@@ -1,8 +1,8 @@
 use std::io::Read;
 
 use anyhow::Ok;
+use chrono::{Duration, Utc};
 use clap::Parser;
-use chrono::{Utc, Duration};
 use url::Url;
 
 mod options;
@@ -28,7 +28,7 @@ pub struct Args {
 }
 
 fn main() -> anyhow::Result<()> {
-    let args = Args::parse();
+    let mut args = Args::parse();
     let config: _ = options::parse_options(&args)?;
 
     let expire_at = Utc::now() + Duration::seconds(config.sign.duration as i64);
@@ -36,9 +36,8 @@ fn main() -> anyhow::Result<()> {
     let mut key = String::new();
     std::io::stdin().read_to_string(&mut key)?;
 
-    let signed_url = sign::sign(args.url.as_ref(), expire_at, &config.sign.key_id, &key)?;
-    println!("{}", signed_url);
+    sign::sign(&mut args.url, expire_at, &config.sign.key_id, &key)?;
+    println!("{}", args.url);
 
     Ok(())
 }
-

@@ -1,14 +1,14 @@
 use std::path::PathBuf;
 
 use anyhow::Context;
-use config::{FileSourceFile, FileFormat};
+use config::{FileFormat, FileSourceFile};
 use serde::Deserialize;
 
 use crate::Args;
 
-const QUALIFIER: &'static str = "com";
-const ORGANIZATION: &'static str = "kentakariya";
-const APPLICATION: &'static str = "cf-sign";
+const QUALIFIER: &str = "com";
+const ORGANIZATION: &str = "kentakariya";
+const APPLICATION: &str = "cf-sign";
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -38,4 +38,3 @@ fn get_config_file() -> anyhow::Result<PathBuf> {
         .map(|d| d.config_dir().join("config.toml"))
         .context("Could not determine location for config file")
 }
-
