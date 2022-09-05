@@ -16,7 +16,7 @@ The following configuration file is required to use this tool and must be placed
 ```toml
 [sign]
 duration = 3600
-key_id = DUMMYKEY123
+key_id = "DUMMYKEY123"
 ```
 
 These options can be selectively overridden using CLI options.
