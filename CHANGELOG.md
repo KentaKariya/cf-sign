@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [1.0.0](https://github.com/KentaKariya/cf-sign/releases/tag/v0.2.0) - 2022-09-05
+## [0.2.0](https://github.com/KentaKariya/cf-sign/releases/tag/v0.2.0) - 2022-09-06
 
 ### Changed
 - Default options must be defined in config file and can be selectively overridden by CLI options ([#4](https://github.com/KentaKariya/cf-sign/issues/4))
