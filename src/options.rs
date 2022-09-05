@@ -1,14 +1,16 @@
 use std::path::PathBuf;
 
 use anyhow::Context;
-use config::{FileFormat, FileSourceFile};
+use config::{FileFormat, FileSourceFile, ConfigBuilder, builder::DefaultState};
 use serde::Deserialize;
 
-use crate::Args;
+use crate::{Cli, UploadCommand, Command};
 
 const QUALIFIER: &str = "com";
 const ORGANIZATION: &str = "kentakariya";
 const APPLICATION: &str = "cf-sign";
+
+type ConfigFile = config::File<FileSourceFile, FileFormat>;
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -21,16 +23,31 @@ pub struct Sign {
     pub key_id: String,
 }
 
-pub fn parse_options(overrides: &Args) -> anyhow::Result<Config> {
-    let config_file: config::File<FileSourceFile, FileFormat> = get_config_file()?.into();
+#[derive(Debug, Deserialize)]
+pub struct Upload {
+    pub bucket: String,
+}
 
-    config::Config::builder()
+pub fn parse_options(overrides: &Cli) -> anyhow::Result<Config> {
+    let config_file: ConfigFile = get_config_file()?.into();
+    let mut config_builder = config::Config::builder()
         .add_source(config_file)
         .set_override_option("sign.duration", overrides.duration)?
-        .set_override_option("sign.key_id", overrides.key_id.clone())?
+        .set_override_option("sign.key_id", overrides.key_id.clone())?;
+
+    if let Command::Upload(cmd) = &overrides.command {
+        config_builder = override_upload_options(config_builder, cmd)?;
+    }
+
+    config_builder
         .build()?
         .try_deserialize::<Config>()
         .context("Could not parse config file")
+}
+
+fn override_upload_options(config_builder: ConfigBuilder<DefaultState>, cmd: &UploadCommand) -> anyhow::Result<ConfigBuilder<DefaultState>> {
+    config_builder.set_override_option("upload.bucket", cmd.bucket.clone())
+        .context("Could not override upload options from CLI")
 }
 
 fn get_config_file() -> anyhow::Result<PathBuf> {
@@ -38,3 +55,4 @@ fn get_config_file() -> anyhow::Result<PathBuf> {
         .map(|d| d.config_dir().join("config.toml"))
         .context("Could not determine location for config file")
 }
+

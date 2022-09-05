@@ -1,8 +1,7 @@
-use std::io::Read;
+use std::{io::Read, path::PathBuf};
 
-use anyhow::Ok;
 use chrono::{Duration, Utc};
-use clap::Parser;
+use clap::{Parser, Subcommand, Args};
 use url::Url;
 
 mod options;
@@ -14,9 +13,9 @@ mod tests;
 /// Generate a signed CloudFront URL using the private key from stdin.
 #[derive(Debug, Parser)]
 #[clap(author, version, about)]
-pub struct Args {
-    #[clap(value_parser = Url::parse)]
-    url: Url,
+pub struct Cli {
+    #[clap(subcommand)]
+    command: Command,
 
     /// Validity in seconds
     #[clap(short, long)]
@@ -27,17 +26,46 @@ pub struct Args {
     key_id: Option<String>,
 }
 
+#[derive(Debug, Subcommand)]
+enum Command {
+    /// Create a signed URL for an existing resource
+    Sign(SignCommand),
+
+    /// Upload a file to S3 and generate a signed URL to it
+    Upload(UploadCommand),
+}
+
+#[derive(Debug, Args)]
+pub struct SignCommand {
+    #[clap(value_parser = Url::parse)]
+    url: Url,
+
+}
+
+#[derive(Debug, Args)]
+pub struct UploadCommand {
+    file: PathBuf,
+
+    #[clap(short, long)]
+    bucket: Option<String>,
+}
+
 fn main() -> anyhow::Result<()> {
-    let mut args = Args::parse();
+    let mut args = Cli::parse();
     let config: _ = options::parse_options(&args)?;
 
     let expire_at = Utc::now() + Duration::seconds(config.sign.duration as i64);
-
     let mut key = String::new();
     std::io::stdin().read_to_string(&mut key)?;
 
-    sign::sign(&mut args.url, expire_at, &config.sign.key_id, &key)?;
-    println!("{}", args.url);
+    match &mut args.command {
+        Command::Sign(s) => {
+            sign::sign(&mut s.url, expire_at, &config.sign.key_id, &key)?;
+            println!("{}", s.url);
+        },
+        Command::Upload(_) => {},
+    }
 
     Ok(())
 }
+
