@@ -52,12 +52,12 @@ fn create_policy(resource: &str, timestamp: i64) -> String {
 }
 
 pub fn sign(resource: &str, expire_at: DateTime<Utc>, key_id: &str, key: &str) -> SigningResult<String> {
+    let mut url = Url::parse(resource)?;
     let timestamp = expire_at.timestamp();
-    let policy = create_policy(resource.as_ref(), timestamp);
 
+    let policy = create_policy(resource.as_ref(), timestamp);
     let signature = derive_signature(&policy, key)?;
 
-    let mut url = Url::parse(resource)?;
     url.query_pairs_mut()
         .append_pair("Expires", &timestamp.to_string())
         .append_pair("Signature", &signature)
