@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.3.0](https://github.com/KentaKariya/cf-sign/releases/tag/v0.3.0) - 2022-09-06
+
+### Added
+- Add upload to S3 ([#8](https://github.com/KentaKariya/cf-sign/issues/8))
+
 ## [0.2.0](https://github.com/KentaKariya/cf-sign/releases/tag/v0.2.0) - 2022-09-06
 
 ### Changed
