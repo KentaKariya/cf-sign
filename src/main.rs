@@ -63,20 +63,18 @@ pub struct UploadCommand {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
-    let config: _ = options::parse_options(&cli)?;
+    let options = options::parse_options(&cli)?;
 
-    let expire_at = Utc::now() + Duration::seconds(config.sign.duration as i64);
+    let expire_at = Utc::now() + Duration::seconds(options.sign.duration as i64);
     let mut key = String::new();
     std::io::stdin().read_to_string(&mut key)?;
 
     let mut url = match &cli.command {
         Command::Sign(s) => s.url.clone(),
-        Command::Upload(u) => upload::upload(&config.upload, &u.file).await?,
+        Command::Upload(u) => upload::upload(&options.upload, &u.file).await?,
     };
 
-    println!("Creating signature for following URL: {}", url.as_str());
-
-    sign::sign(&mut url, expire_at, &config.sign.key_id, &key)?;
+    sign::sign(&mut url, expire_at, &options.sign.key_id, &key)?;
     println!("{}", url.as_str());
 
     Ok(())

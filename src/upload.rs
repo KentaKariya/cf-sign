@@ -6,14 +6,14 @@ use url::Url;
 
 use crate::options;
 
-pub async fn upload(config: &options::Upload, path: &PathBuf) -> anyhow::Result<Url> {
-    let client = create_client(config).await;
-    let s3_key = derive_s3_key(&config.prefix, path)?;
+pub async fn upload(options: &options::Upload, path: &PathBuf) -> anyhow::Result<Url> {
+    let client = create_client(options).await;
+    let s3_key = derive_s3_key(&options.prefix, path)?;
     let bs = ByteStream::from_path(path).await?;
     let mime = mime_guess::from_path(path).first_or_octet_stream();
 
     client.put_object()
-        .bucket(&config.bucket)
+        .bucket(&options.bucket)
         .key(&s3_key)
         .content_type(mime.essence_str())
         .body(bs)
@@ -21,8 +21,8 @@ pub async fn upload(config: &options::Upload, path: &PathBuf) -> anyhow::Result<
         .await
         .context("Failed to upload file to S3")?;
 
-    Url::parse(&config.url)
-        .context(format!("Invalid URL {}", &config.url))?
+    Url::parse(&options.url)
+        .context(format!("Invalid URL {}", &options.url))?
         .join(&s3_key)
         .context(format!("Could not create URL for {}", &s3_key))
 }

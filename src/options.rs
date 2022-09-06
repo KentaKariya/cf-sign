@@ -13,7 +13,7 @@ const APPLICATION: &str = "cf-sign";
 type ConfigFile = config::File<FileSourceFile, FileFormat>;
 
 #[derive(Debug, Deserialize)]
-pub struct Config {
+pub struct Options {
     pub sign: Sign,
     pub upload: Upload,
 }
@@ -32,7 +32,7 @@ pub struct Upload {
     pub region: Option<String>,
 }
 
-pub fn parse_options(overrides: &Cli) -> anyhow::Result<Config> {
+pub fn parse_options(overrides: &Cli) -> anyhow::Result<Options> {
     let config_file: ConfigFile = get_config_file()?.into();
     let mut config_builder = config::Config::builder()
         .add_source(config_file)
@@ -45,7 +45,7 @@ pub fn parse_options(overrides: &Cli) -> anyhow::Result<Config> {
 
     config_builder
         .build()?
-        .try_deserialize::<Config>()
+        .try_deserialize::<Options>()
         .context("Could not parse config file")
 }
 
