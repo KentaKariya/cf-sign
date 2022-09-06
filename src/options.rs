@@ -28,6 +28,7 @@ pub struct Sign {
 pub struct Upload {
     pub bucket: String,
     pub prefix: String,
+    pub region: Option<String>,
 }
 
 pub fn parse_options(overrides: &Cli) -> anyhow::Result<Config> {

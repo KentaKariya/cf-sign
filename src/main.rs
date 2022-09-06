@@ -52,6 +52,9 @@ pub struct UploadCommand {
 
     #[clap(short, long)]
     prefix: Option<String>,
+
+    #[clap(short, long)]
+    region: Option<String>,
 }
 
 #[tokio::main]
@@ -69,7 +72,7 @@ async fn main() -> anyhow::Result<()> {
             println!("{}", s.url);
         }
         Command::Upload(u) => {
-            upload::upload(&u.file, &config.upload.bucket, &config.upload.prefix).await?;
+            upload::upload(config.upload, &u.file).await?;
         }
     }
 
