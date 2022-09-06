@@ -6,6 +6,7 @@ use url::Url;
 
 mod options;
 mod sign;
+mod upload;
 
 #[cfg(test)]
 mod tests;
@@ -48,22 +49,28 @@ pub struct UploadCommand {
 
     #[clap(short, long)]
     bucket: Option<String>,
+
+    #[clap(short, long)]
+    prefix: Option<String>,
 }
 
-fn main() -> anyhow::Result<()> {
-    let mut args = Cli::parse();
-    let config: _ = options::parse_options(&args)?;
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let mut cli = Cli::parse();
+    let config: _ = options::parse_options(&cli)?;
 
     let expire_at = Utc::now() + Duration::seconds(config.sign.duration as i64);
     let mut key = String::new();
     std::io::stdin().read_to_string(&mut key)?;
 
-    match &mut args.command {
+    match &mut cli.command {
         Command::Sign(s) => {
             sign::sign(&mut s.url, expire_at, &config.sign.key_id, &key)?;
             println!("{}", s.url);
-        },
-        Command::Upload(_) => {},
+        }
+        Command::Upload(u) => {
+            upload::upload(&u.file, &config.upload.bucket, &config.upload.prefix).await?;
+        }
     }
 
     Ok(())
