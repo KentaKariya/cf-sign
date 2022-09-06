@@ -38,6 +38,7 @@ enum Command {
 
 #[derive(Debug, Args)]
 pub struct SignCommand {
+    /// URL to sign
     #[clap(value_parser = Url::parse)]
     url: Url,
 
@@ -45,19 +46,24 @@ pub struct SignCommand {
 
 #[derive(Debug, Args)]
 pub struct UploadCommand {
+    /// Path to target
     file: PathBuf,
 
+    /// Base URL of the CloudFront distribution
     #[clap(short, long)]
     url: Option<String>,
 
+    /// S3 bucket name
     #[clap(short, long)]
     bucket: Option<String>,
 
-    #[clap(short, long)]
-    prefix: Option<String>,
-
+    /// S3 bucket region
     #[clap(short, long)]
     region: Option<String>,
+
+    /// S3 key prefix for uploaded file
+    #[clap(short, long)]
+    prefix: Option<String>,
 }
 
 #[tokio::main]
