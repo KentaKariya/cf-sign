@@ -26,6 +26,7 @@ pub struct Sign {
 
 #[derive(Debug, Deserialize)]
 pub struct Upload {
+    pub url: String,
     pub bucket: String,
     pub prefix: String,
     pub region: Option<String>,
@@ -50,6 +51,7 @@ pub fn parse_options(overrides: &Cli) -> anyhow::Result<Config> {
 
 fn override_upload_options(config_builder: ConfigBuilder<DefaultState>, cmd: &UploadCommand) -> anyhow::Result<ConfigBuilder<DefaultState>> {
     config_builder
+        .set_override_option("upload.url", cmd.url.clone())?
         .set_override_option("upload.bucket", cmd.bucket.clone())?
         .set_override_option("upload.prefix", cmd.prefix.clone())
         .context("Could not override upload options")

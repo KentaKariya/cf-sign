@@ -48,6 +48,9 @@ pub struct UploadCommand {
     file: PathBuf,
 
     #[clap(short, long)]
+    url: Option<String>,
+
+    #[clap(short, long)]
     bucket: Option<String>,
 
     #[clap(short, long)]
@@ -59,22 +62,22 @@ pub struct UploadCommand {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let mut cli = Cli::parse();
+    let cli = Cli::parse();
     let config: _ = options::parse_options(&cli)?;
 
     let expire_at = Utc::now() + Duration::seconds(config.sign.duration as i64);
     let mut key = String::new();
     std::io::stdin().read_to_string(&mut key)?;
 
-    match &mut cli.command {
-        Command::Sign(s) => {
-            sign::sign(&mut s.url, expire_at, &config.sign.key_id, &key)?;
-            println!("{}", s.url);
-        }
-        Command::Upload(u) => {
-            upload::upload(config.upload, &u.file).await?;
-        }
-    }
+    let mut url = match &cli.command {
+        Command::Sign(s) => s.url.clone(),
+        Command::Upload(u) => upload::upload(&config.upload, &u.file).await?,
+    };
+
+    println!("Creating signature for following URL: {}", url.as_str());
+
+    sign::sign(&mut url, expire_at, &config.sign.key_id, &key)?;
+    println!("{}", url.as_str());
 
     Ok(())
 }
